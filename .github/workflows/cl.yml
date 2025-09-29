@@ -1,13 +1,46 @@
-name: Mi Primer Pipeline
+name: Security Pipeline
 
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
 
 jobs:
-  hola-mundo:
+  security-checks:
     runs-on: ubuntu-latest
+
     steps:
+      # 1. Descargar el código del repositorio
       - name: Descargar código
         uses: actions/checkout@v3
 
-      - name: Mostrar un mensaje
-        run: echo "Hola, GitHub Actions ya funciona 🚀"
+      # 2. Instalar dependencias de Node.js
+      - name: Instalar dependencias
+        run: npm install
+
+      # 3. Análisis estático con ESLint
+      - name: Análisis estático (ESLint)
+        run: npx eslint .
+
+      # 4. Revisión de vulnerabilidades en dependencias
+      - name: Análisis de dependencias (npm audit)
+        run: npm audit --json > audit-report.json
+
+      # 5. Levantar aplicación (ejemplo: puerto 3000)
+      - name: Levantar aplicación
+        run: |
+          nohup npm start &
+          sleep 10
+
+      # 6. Escaneo dinámico con OWASP ZAP
+      - name: Análisis dinámico con OWASP ZAP
+        run: docker run -t --network host owasp/zap2docker-stable zap-baseline.py -t http://localhost:3000 -r zap-report.html
+
+      # 7. Subir reportes como artefactos para revisarlos
+      - name: Guardar reportes
+        uses: actions/upload-artifact@v3
+        with:
+          name: reportes-seguridad
+          path: |
+            audit-report.json
+            zap-report.html
+```
