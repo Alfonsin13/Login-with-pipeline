@@ -1,0 +1,13 @@
+name: Mi Primer Pipeline
+
+on: [push, pull_request]
+
+jobs:
+  hola-mundo:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Descargar código
+        uses: actions/checkout@v3
+
+      - name: Mostrar un mensaje
+        run: echo "Hola, GitHub Actions ya funciona 🚀"
